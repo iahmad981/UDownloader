@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from blueconvert.com/ by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 24 Oct 2020 07:39:40 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+
+    <title>Youtube Video Downloader - UDownloader</title>
+    <meta name="description" content="Youtube Video Downloader for easy, free and quick downloads." />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="canonical" href="index.html" />
+
+
+    <!-- JQUERY -->
+    <script src="js/jquery-3.4.1.minde0e.js?v=5311" type="text/javascript"></script>
+    <script src="js/js.cookie.minde0e.js?v=5311" type="text/javascript"></script>
+    <script src="js/isMobile.minde0e.js?v=5311" type="text/javascript"></script>
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.minde0e.css?v=5311">
+    <link rel="stylesheet" href="css/fontawesome.minde0e.css?v=5311">
+	<link rel="stylesheet" href="css/customde0e.css?v=5311">
+	<!-- Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<header>
+    <div class="navbar bg-white shadow-sm">
+        <div class="container d-flex justify-content-between">
+            <a href="index.html" title="Youtube Video Downloader" class="navbar-brand d-flex align-items-center" style="color:black; font-family: 'Roboto Mono', monospace;
+			">
+                <strong>U<font color="#FF0000">Downloader</font></strong>
+            </a>
+        </div>
+    </div>
+</header><main role="main">
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 style="font-family: 'Roboto Mono', monospace;
+			"><b>U</b><font color="#FF0000"><b>Downloader</b></font></h1>
+            <div class="input-group mb-3">
+                <input name="videoUrl" id="videoUrl" type="text" class="form-control form-control-lg" placeholder="https://www.youtube.com/example">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-information btn-primary" id="videoDetailButton"><i class="fas fa-download" aria-hidden="true"></i></button>
+                </div>
+            </div>
+            <div id="invalidVideoAlertBox" class="alert alert-danger" role="alert" style="display:none;">
+                <b>Youtube video address is invalid!</b>
+            </div>
+            <div id="errorVideoAlertBox" class="alert alert-danger" role="alert" style="display:none;"></div>
+            <p class="lead text-muted">YouTube to MP3/MP4 video downloader for easy, free and extremely quick downloads.</p>
+            <div id="content" style="display:none;">
+                <hr>
+                <div class="progress" id="videoDetailLoading" style="display:none;">
+                    <div id="dynamic" class="progress-bar progress-bar-success progress-bar-striped progress-bar-animated active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                        <span id="current-progress"></span>
+                    </div>
+                </div>
+
+
+                <div class="card mb-3" id="videoDetail" style="display:none;">
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <img src="#" class="card-img" id="videoImageUrl" style="height: 100%;">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" id="videoTitle"></h5>
+                                <p class="card-text">
+                                    <div class="input-group mb-2">
+                                        <select class="custom-select" id="downloadFormat">
+                                            <option>Choose Format...</option>
+                                            <optgroup label="MP3 (Sound)" id="soundFormats">
+                                            </optgroup>
+
+                                            <optgroup label="MP4 (Video)" id="videoFormats">
+                                            </optgroup>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button class="btn input-group-text" id="download"><i class="fa fa-check" aria-hidden="true" style="color:#007bff;"></i></button>
+                                        </div>
+                                    </div>
+                                </p>
+
+                                <a type="button" href="javascript:void();" class="btn btn-primary" id="downloadButton" style="display:none;">
+                                    <i class="fa fa-download" aria-hidden="true"></i> Click to Download <i class="fa fa-download" aria-hidden="true"></i>
+                                </a>
+
+                                <div class="progress" id="convertLoading" style="display:none;">
+                                    <div id="dynamic" class="progress-bar progress-bar-success progress-bar-striped  progress-bar-animated active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                        <span id="current-progress"></span>
+                                    </div>
+                                </div>
+
+                                <p class="card-text"><small class="text-muted" id="videoAuthorName"></small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-primary" role="alert">
+                Download  <b>free</b>  Videos<br/>
+                
+            </div>
+        </div>
+
+
+    </section>
+    <script type="text/javascript">
+        document.getElementById("videoUrl").addEventListener("keyup", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.getElementById("videoDetailButton").click();
+            }
+        });
+
+
+        function videoDetailLoadingBar(){
+            $("#content").show();
+            $("#videoAuthorName").show();
+            $("#downloadButton").hide();
+            $("#videoDetail").hide();
+            $("#convertLoading").hide();
+            $("#videoDetailLoading > #dynamic").css("width", 10 + "%").attr("aria-valuenow", 10).text(10 + "%");
+            $("#videoDetailLoading").show();
+
+            let current_progress = 0;
+            let interval = setInterval(function() {
+                current_progress += 10;
+
+                $("#videoDetailLoading > #dynamic")
+                    .css("width", current_progress + "%")
+                    .attr("aria-valuenow", current_progress)
+                    .text(current_progress + "%");
+
+                if (current_progress >= 100)
+                    clearInterval(interval);
+            }, 1000);
+        }
+
+        function videoConvertChecker(type,format){
+            if(type === "sound" && window.readType === "video"){
+                window.readType = "sound";
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: window.serverUrl+"/detail.php",
+                data: {"id":window.videoId,"format":format,"type":type,"readType":window.readType},
+                dataType: "json",
+                success: function(result) {
+                    if(result.status === 2){
+                        let progressBarText = result.downloadPercent + "% downloading.";
+
+                        if(window.readType === "convert"){
+                            progressBarText = result.downloadPercent + "% converting.";
+                        }
+
+
+                        if(window.readType !== "convert" && type === "video"){
+                            progressBarText = result.downloadPercent + "% "+window.readType+" converting.";
+                        }
+
+                        if(result.downloadPercent === 100){
+                            progressBarText = "Wait a few seconds...";
+                        }
+
+                        if(result.downloadPercent !== 0){
+                            $("#convertLoading > #dynamic")
+                                .css("width", result.downloadPercent + "%")
+                                .attr("aria-valuenow", result.downloadPercent)
+                                .text(progressBarText);    
+                        }
+
+                        if(result.downloadPercent === 100 && window.readType === "video" && type === "video"){
+                            window.readType = "sound";
+                        }else if(result.downloadPercent === 100 && ((window.readType === "sound" && type === "video") || (window.readType === "sound" && type === "sound"))){
+                            window.readType = "convert";
+                        }
+                    }
+
+
+                    if(result.status === 1){
+                        clearInterval(window.convertVideoInterval);
+                        $("#convertLoading").hide();
+                        $("#downloadButton").attr("href",result.fileUrl).attr("download",result.fileName).show();
+                    }
+                }
+            });
+        }
+
+        function videoConvert(format){
+            if(window.lastVideoFormat === format){
+                return false;
+            }
+
+            clearInterval(window.convertVideoInterval);
+
+            $("#videoAuthorName").hide();
+            $("#downloadButton").hide();
+            $("#convertLoading").show();
+
+            $("#convertLoading > #dynamic").css("width", 100 + "%").attr("aria-valuenow", 100).text("Wait a few seconds...");
+
+            window.lastVideoFormat = format;
+            $.ajax({
+                type: 'POST',
+                url: window.serverUrl+"/convert.php",
+                data: {"id":window.videoId,"format":format},
+                dataType: "json",
+                success: function(result) {
+                    if(result.status){
+                        window.readType = "video";
+                        window.convertVideoInterval = setInterval(function() {
+                            videoConvertChecker(result.type,format);
+                        },6000);
+                    }
+
+                }
+            });
+        }
+
+        function videoDetailFill(){
+            videoDetailLoadingBar();
+            clearInterval(window.convertVideoInterval);
+            window.lastVideoFormat = null;
+            $("#invalidVideoAlertBox").hide();
+            $("#errorVideoAlertBox").hide();
+
+
+            $.getJSON("serverRouter5445.html?id="+window.videoId, function(response) {
+                if(response.status){
+                    window.serverUrl = response.serverUrl;
+                }
+
+                $.getJSON(window.serverUrl+"/api.php?id="+window.videoId, function(response) {
+                    if(!response.status){
+                        $("#errorVideoAlertBox").html("<b>"+response.message+"</b>").show();
+                        $("#content").hide();
+                        return false;
+                    }
+
+                    $("#videoDetailLoading").hide();
+                    $("#videoFormats").html("");
+                    $("#soundFormats").html("");
+
+                    $("#videoTitle").text(response.videoDetail.title);
+                    $("#videoAuthorName").text(response.videoDetail.authorName);
+                    $("#videoImageUrl").attr("src",response.videoDetail.thumbnailUrl);
+
+                    $.each(response.videoDetail.formats.sounds, function(bitrate,format) {
+                        let addFileSize = "";
+                        if(format.size != null){
+                            addFileSize = "("+format.size+")";
+                        }
+
+                        $("#soundFormats").append("<option value='"+bitrate+"'>"+format.bitrate+" "+addFileSize+"</option>");
+                    });
+
+                    $.each(response.videoDetail.formats.videos, function(resolution,format) {
+                        let addFileSize = "";
+                        if(format.size != null){
+                            addFileSize = "("+format.size+")";
+                        }
+
+                        $("#videoFormats").append("<option value='"+resolution+"'>"+format.resolution+" "+addFileSize+"</option>");
+                    });
+
+                    $("#videoDetail").show();
+                })
+            });
+
+
+        }
+
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+        };
+
+        window.videoId = null;
+        window.readType = "video";
+        window.convertVideoInterval = null;
+        window.lastVideoFormat = null;
+        window.serverUrl = "index.html";
+        $(document).ready(function () {
+            let videoId = getUrlParameter('id');
+            if(videoId){
+                $("#videoUrl").val("https://www.youtube.com/watch?v="+videoId);
+                setTimeout(function () {
+                	$("#videoDetailButton").click();
+                },250);
+            }
+
+
+            $("html").on('change', "#downloadFormat", function() {
+                $("#downloadButton").hide();
+                $("#videoAuthorName").show();
+                $("#download").click();
+            });
+
+
+            // button
+            $("html").on('click', "#downloadButton", function() {
+/*
+                if(isMobile.any){
+                    return;
+                }
+
+                let isPopup = Cookies.get('isPopup');
+                if(isPopup){
+                    return;
+                }
+
+                let inHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+
+                Cookies.set('isPopup', 'yes', { expires: inHour });
+*/
+
+                window.open("https://fast-redirecting.com/sl/7ea309c6");
+            });
+
+
+            $("#videoUrl").bind("paste", function(e){
+                let videoIdRegex = e.originalEvent.clipboardData.getData('text').match(/^.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/[^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*/);
+                if(!videoIdRegex){
+                    return true;
+                }
+
+                setTimeout(function(){$("#videoDetailButton").click();},250);
+               
+            });
+
+            $("#videoDetailButton").on("click",function () {
+                let videoIdRegex = $("#videoUrl").val().match(/^.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/[^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*/);
+                if(videoIdRegex === null){
+                    $("#invalidVideoAlertBox").show();
+                    return false;
+                }
+
+                if(window.videoId === videoIdRegex[3]){
+                    return false;
+                }
+
+                window.videoId = videoIdRegex[3];
+                videoDetailFill();
+            });
+
+
+            $("#download").on("click",function(){
+                videoConvert($("#downloadFormat").val());
+            });
+        });
+    </script>
+</main>
+<footer class="text-muted">
+    <div class="container">
+        <p>&copy; 2020 <strong>UDownloader</strong></p>
+    </div>
+</footer>
+
+</body>
+
+</html>
